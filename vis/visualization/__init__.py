@@ -12,22 +12,22 @@ from .saliency import visualize_cam
 from keras import backend as K
 
 
-def get_num_filters(layer):
+def get_num_filters(layer, node_index=0):
     """Determines the number of filters within the given `layer`.
 
     Args:
         layer: The keras layer to use.
-
+        node_index: if layer has multiple inputs, we have to choose which one to use. default is 0 (first)
     Returns:
         Total number of filters within `layer`.
         For `keras.layers.Dense` layer, this is the total number of outputs.
     """
     # Handle layers with no channels.
-    if K.ndim(layer.output) == 2:
+    if K.ndim(layer.get_output_at(node_index)) == 2:
         return K.int_shape(layer.output)[-1]
 
     channel_idx = 1 if K.image_data_format() == 'channels_first' else -1
-    return K.int_shape(layer.output)[channel_idx]
+    return K.int_shape(layer.get_output_at(node_index))[channel_idx]
 
 
 def overlay(array1, array2, alpha=0.5):

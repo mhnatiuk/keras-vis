@@ -127,7 +127,7 @@ def visualize_saliency(model, layer_idx, filter_indices, seed_input,
     return visualize_saliency_with_losses(model.input, losses, seed_input, wrt_tensor, grad_modifier)
 
 
-def visualize_cam_with_losses(input_tensor, losses, seed_input, penultimate_layer, grad_modifier=None):
+def visualize_cam_with_losses(input_tensor, losses, seed_input, penultimate_layer, grad_modifier=None, node_index=0):
     """Generates a gradient based class activation map (CAM) by using positive gradients of `input_tensor`
     with respect to weighted `losses`.
 
@@ -150,11 +150,12 @@ def visualize_cam_with_losses(input_tensor, losses, seed_input, penultimate_laye
             with respect to filter output.
         grad_modifier: gradient modifier to use. See [grad_modifiers](vis.grad_modifiers.md). If you don't
             specify anything, gradients are unchanged (Default value = None)
+        node_index: if layer has multiple inputs, we have to choose which one to use. default is 0 (first)
 
     Returns:
         The normalized gradients of `seed_input` with respect to weighted `losses`.
     """
-    penultimate_output = penultimate_layer.output
+    penultimate_output = penultimate_layer.get_output_at(node_index)
     opt = Optimizer(input_tensor, losses, wrt_tensor=penultimate_output, norm_grads=False)
     _, grads, penultimate_output_value = opt.minimize(seed_input, max_iter=1, grad_modifier=grad_modifier, verbose=False)
 

@@ -55,7 +55,7 @@ class ActivationMaximization(Loss):
     One might also use this to generate an input image that maximizes both 'dog' and 'human' outputs on the final
     `keras.layers.Dense` layer.
     """
-    def __init__(self, layer, filter_indices):
+    def __init__(self, layer, filter_indices, node_index=0):
         """
         Args:
             layer: The keras layer whose filters need to be maximized. This can either be a convolutional layer
@@ -66,14 +66,16 @@ class ActivationMaximization(Loss):
                 If you are optimizing final `keras.layers.Dense` layer to maximize class output, you tend to get
                 better results with 'linear' activation as opposed to 'softmax'. This is because 'softmax'
                 output can be maximized by minimizing scores for other classes.
+            node_index: if layer has multiple inputs, we have to choose which one to use. default is 0 (first)
         """
         super(ActivationMaximization, self).__init__()
         self.name = "ActivationMax Loss"
         self.layer = layer
         self.filter_indices = utils.listify(filter_indices)
+        self.node_index = node_index
 
     def build_loss(self):
-        layer_output = self.layer.output
+        layer_output = self.layer.get_output_at(self.node_index)
 
         # For all other layers it is 4
         is_dense = K.ndim(layer_output) == 2

@@ -115,6 +115,7 @@ def visualize_saliency(model, layer_idx, filter_indices, seed_input,
         The heatmap image indicating the `seed_input` regions whose change would most contribute towards
         maximizing the output of `filter_indices`.
     """
+    print("I modified this!")
     if backprop_modifier is not None:
         modifier_fn = get(backprop_modifier)
         model = modifier_fn(model)
